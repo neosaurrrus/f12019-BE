@@ -113,7 +113,7 @@ const Mutation = new GraphQLObjectType({
             args: {
                 firstName: {type: new GraphQLNonNull(GraphQLString)},
                 lastName:  {type: new GraphQLNonNull(GraphQLString)},
-                nationality: {type: GraphQLString},
+                nationality: {type: new GraphQLNonNull(GraphQLString)},
                 teamId:   {type: GraphQLID}
             },
             resolve(parent,args){
@@ -124,6 +124,42 @@ const Mutation = new GraphQLObjectType({
                     teamId: args.teamId
                 })
                 return driver.save();
+            }
+        }, 
+        deleteDriver: {
+            type: driverType,
+             args: { 
+                 id: {type: GraphQLID} 
+            },
+            resolve(parent, args) {
+                return Driver.findByIdAndDelete(args.id);
+            }
+        },
+        deleteTeam: {
+            type: teamType,
+            args: {
+                id: { type: GraphQLID }
+            },
+            resolve(parent, args) {
+                return Team.findByIdAndDelete(args.id);
+            }
+        },
+        updateTeam: {
+            type: teamType,
+            args: {  //What details are you providing?
+                id: { type: GraphQLID },
+                name: { type: new GraphQLNonNull(GraphQLString) },
+                founded: { type: new GraphQLNonNull(GraphQLInt) }
+            },
+            resolve(parent, args) {
+                let team = new Team({ //Use the Team model defined in the DB pluging in arg values
+                    name: args.name,
+                    founded: args.founded
+                })
+                return Team.findByIdAndUpdate(args.id, {
+                    name: args.name,
+                    founded: args.founded
+                });
             }
         }
     }
